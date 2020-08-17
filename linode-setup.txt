@@ -1,0 +1,15 @@
+wget -c https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
+adduser --system --group proxyrunner
+
+su -s /bin/bash proxyrunner
+cd ~
+rm -r ~/hajo-*-mini-proxy/
+git clone https://github.com/fxtentacle/hajo-linode-mini-proxy
+cd ~/hajo-linode-mini-proxy/
+/usr/local/go/bin/go build
+
+setcap 'cap_net_bind_service=+ep' /home/proxyrunner/hajo-linode-mini-proxy/hajo-linode-mini-proxy
+
+su -s /bin/bash proxyrunner
+cd ~/hajo-linode-mini-proxy/
+PORT=80 PROXYAUTH=X screen ./hajo-linode-mini-proxy

@@ -1,4 +1,4 @@
-module github.com/fxtentacle/hajo-heroku-mini-proxy
+module github.com/fxtentacle/hajo-linode-mini-proxy
 
 go 1.13
 
