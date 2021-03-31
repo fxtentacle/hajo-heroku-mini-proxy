@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/elazarl/goproxy"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -34,6 +35,32 @@ func main() {
 			return
 		}
 		fmt.Println("IP is authorized: ", ip)
+
+		if request.URL.Path == "/client_ip" {
+			writer.WriteHeader(200)
+			writer.Write([]byte(ip))
+			return
+		}
+
+		if strings.HasPrefix(request.URL.Path, "/resolve/") {
+			resolveMe := request.URL.Path[9:]
+			ips, err := net.LookupIP(resolveMe)
+			ipStrs := []string{}
+			for _, ip := range ips {
+				ipStrs = append(ipStrs, ip.String())
+			}
+			if(err != nil) {
+				fmt.Println("ERROR: Could not resolve ", resolveMe)
+				writer.WriteHeader(500)
+				writer.Write([]byte("500 RESOLV ERROR\n"))
+			} else {
+				fmt.Println("RESOLVED: ", resolveMe, " -> ", )
+				writer.WriteHeader(200)
+				writer.Write([]byte(strings.Join(ipStrs, ",")))
+			}
+			return
+		}
+
 
 		proxy.ServeHTTP(writer, request)
 	}
